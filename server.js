@@ -7,47 +7,53 @@ app.use(cors());
 
 const server = http.createServer(app);
 
+
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:3000",
     },
 });
 
+let players = {};
+let rooms = {};
 
 io.on('connection', (socket) => {
-    //console.log(`podlaczono nowego usera: ${socket.id}`)
 
-    // socket.on('dolacz', (data) => {
-    //     socket.join(data);
-    // });
+    //tworzy lobby
+    socket.on('stworz', (room, nick) => {
+        console.log('host ' + nick + ' dołacza do ' + room);
 
-    // socket.on('rozlacz', (data) => {
-    //     socket.data.size === 0;
-    // });
 
-    socket.on('wysWia', (data, room) => {
-        if(room === ''){
-            socket.broadcast.emit('odpowiedz', data);
-        }
-        else{
-            socket.to(room).emit('odpowiedz', data);
-        }  
-    });
-
-    socket.on('dolacz', (room) => {
-        console.log('polaczono z ' + room);
+        players[socket.id] = {id: socket.id, room: room, nick: nick};
         socket.join(room);
-        socket.to(room).emit('odpowiedz', room);
-    });
+        console.log(socket.rooms);
+    })
 
-    socket.on('wiado', (data, room) => {
-        console.log(data);
-        socket.to(room).emit('odpo', data);
+
+
+    socket.on('dolacz', (room, nick) => {
+        console.log('play ' + nick + ' dołacza do ' + room);
+
+        players[socket.id] = {id: socket.id, room: room, nick: nick};
+        socket.join(room);
+        socket.to(room).emit('nowyGracz', socket.id ,room, nick);
+        console.log(socket.rooms);
+    })
+
+    socket.on('lista', (room, {gracze}) => {
+        socket.join(room);
+        socket.to(room).emit('listaOdp', gracze);
+        console.log(gracze);
+        console.log(room + ' XD');
     })
     
+    socket.on('disconnect', () => {
+        console.log('wywalilo gracza o id: ' + socket.id);
+        socket.broadcast.emit('usun', players[socket.id]);
+        delete players[socket.id];
+    })
+
 });
-
-
 
 
 server.listen(3001, () => {
