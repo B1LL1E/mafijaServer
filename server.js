@@ -3,6 +3,8 @@ const app = express();
 const { Server } = require('socket.io');
 const http = require('http');
 const cors = require('cors');
+require('dotenv').config();
+
 app.use(cors());
 
 const server = http.createServer(app);
@@ -10,12 +12,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: process.env.STRONA_CLIENTA,
     },
 });
 
 let players = {};
 let rooms = {};
+
+console.log(process.env.STRONA_CLIENTA);
 
 io.on('connection', (socket) => {
 
