@@ -26,7 +26,6 @@ io.on('connection', (socket) => {
 
         players[socket.id] = {id: socket.id, room: room, nick: nick};
         socket.join(room);
-        //socket.join(players[socket.id].id);
         console.log(socket.rooms);
     })
 
@@ -37,14 +36,12 @@ io.on('connection', (socket) => {
 
         players[socket.id] = {id: socket.id, room: room, nick: nick};
         socket.join(room);
-        socket.join(players[socket.id].id);
-
         socket.to(room).emit('nowyGracz', socket.id ,room, nick);
         console.log(socket.rooms);
     })
 
     socket.on('lista', (room, {gracze}) => {
-        // socket.join(room);
+        socket.join(room);
         socket.to(room).emit('listaOdp', gracze);
         console.log(gracze);
         console.log(room + ' XD');
@@ -58,46 +55,16 @@ io.on('connection', (socket) => {
 
 
 
-
-    //rozrywka host
-
-    //iloscGlosujacych
-    socket.on('iloscGlosujacych', (liczGlos, room) => {
-        socket.to(room).emit('iloscGlosujacychOdp',liczGlos);
-        console.log('liczba glosujacych to ' + liczGlos);
-    });
-
-    //liczba glosow
-    socket.on('liczbaGlosow', (glosy, room) => {
-        socket.to(room).emit('liczbaGlosowOdp', glosy);
-        console.log('H nowe glosu to ');
-        console.log(glosy);
-    })
-
-
-
-
     //rozgrywkaGuest
     socket.on('startGry', (room) => {
         socket.to(room).emit('startGryOdp');
     })
 
-    socket.on('twojaRola', (idGracza, nazwaKlasy) => {       
-        socket.to(idGracza).emit('twojaRolaOdp' , nazwaKlasy);
+    socket.on('twojaRola', (idGracza, nazwaKlasy) => {
+        io.to(idGracza).emit('twojaRolaOdp' , nazwaKlasy);
         console.log(idGracza + "  " + nazwaKlasy);
+        // to(idGracza)
     });
-
-    //glos
-    socket.on('Glos', (glos, room) => {
-        console.log(room);
-        socket.to(room).emit('GlosOdp', glos);
-        console.log('G nowe glosu to ');
-        console.log(glos);
-    });
-
-    
-
-    
 
 });
 
