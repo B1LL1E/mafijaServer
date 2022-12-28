@@ -70,13 +70,17 @@ io.on('connection', (socket) => {
         socket.to(room).emit('iloscGlosujacychOdp',liczGlos);
         console.log('liczba glosujacych to ' + liczGlos);
     });
-
     //liczba glosow
     socket.on('liczbaGlosow', (glosy, room) => {
         socket.to(room).emit('liczbaGlosowOdp', glosy);
         console.log('H nowe glosu to ');
         console.log(glosy);
     })
+    //wyrzucono emit
+    socket.on('wyrzucono', (glosy1, room) => {
+        socket.to(room).emit('wyrzuconoOdp', glosy1);
+        console.log('wyrzucono ' + glosy1.id + ' z pokoju ' + room);
+    });
 
 
 
