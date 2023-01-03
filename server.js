@@ -77,8 +77,8 @@ io.on('connection', (socket) => {
         console.log(glosy);
     })
     //wyrzucono emit
-    socket.on('wyrzucono', (glosy1, room) => {
-        socket.to(room).emit('wyrzuconoOdp', glosy1);
+    socket.on('wyrzucono', (glosy1, room, gracze, glosyGracze) => {
+        socket.to(room).emit('wyrzuconoOdp', glosy1, gracze, glosyGracze);
         console.log('wyrzucono ' + glosy1.id + ' z pokoju ' + room);
     });
 
