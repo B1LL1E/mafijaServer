@@ -81,6 +81,10 @@ io.on('connection', (socket) => {
         socket.to(room).emit('wyrzuconoOdp', glosy1, gracze, glosyGracze);
         console.log('wyrzucono ' + glosy1.id + ' z pokoju ' + room);
     });
+    //nikt nie zginol
+    socket.on('wyrzuconoNull', (room, gracze, glosy) => {
+        socket.to(room).emit('wyrzuconoNullOdp', gracze, glosy);
+    });
 
 
 
