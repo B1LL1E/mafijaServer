@@ -94,8 +94,9 @@ io.on('connection', (socket) => {
         socket.to(room).emit('startGryOdp');
     })
 
-    socket.on('twojaRola', (idGracza, nazwaKlasy) => {       
-        socket.to(idGracza).emit('twojaRolaOdp' , nazwaKlasy);
+    socket.on('twojaRola', (idGracza, nazwaKlasy) => {    
+        players[idGracza].klasa = nazwaKlasy;   
+        socket.to(idGracza).emit('twojaRolaOdp', idGracza, nazwaKlasy);
         console.log(idGracza + "  " + nazwaKlasy);
     });
 
