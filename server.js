@@ -60,6 +60,15 @@ io.on('connection', (socket) => {
         delete players[socket.id];
     })
 
+    //za duza liczba graczy
+    socket.on('rozlacz', (id, room, nick) => {
+        console.log('za duzo graczy w ' + room + ' usunieto ' + id);
+        socket.to(id).emit('rozlaczOdp', room);
+        socket.broadcast.emit('usun', players[socket.id]);
+        delete players[socket.id];
+    });
+
+
 
 
 
