@@ -29,6 +29,8 @@ io.on('connection', (socket) => {
 
 
         players[socket.id] = {id: socket.id, room: room, nick: nick};
+        rooms[room] = {iloGra: 1, host: socket.id};
+
         socket.join(room);
         //socket.join(players[socket.id].id);
         console.log(socket.rooms);
@@ -40,11 +42,36 @@ io.on('connection', (socket) => {
         console.log('play ' + nick + ' dołacza do ' + room);
 
         players[socket.id] = {id: socket.id, room: room, nick: nick};
-        socket.join(room);
-        socket.join(players[socket.id].id);
+        rooms[room] = {iloGra: rooms[room].iloGra + 1, host: rooms[room].host};
 
-        socket.to(room).emit('nowyGracz', socket.id ,room, nick);
-        console.log(socket.rooms);
+        
+        socket.join(players[socket.id].id);
+        socket.join(room);
+        if(rooms[players[socket.id].room].iloGra < 4){
+            socket.join(room);
+            
+            socket.to(room).emit('nowyGracz', socket.id ,room, nick);
+            console.log('dodano gracza ' + players[socket.id].nick);
+        }
+        else{
+            let idgracza = players[socket.id].id;
+
+            socket.join(idgracza);
+            console.log('za duzo graczy w ' + room + ' usunieto ' + players[socket.id].id);
+            // setTimeout(() => {
+                console.log(idgracza);
+                socket.emit('rozlaczOdp', room, socket.id);
+                console.log('wyslasno rozlaczOdp'); 
+            // }, 2000);
+            
+            let pokujGracza = players[socket.id].room
+            rooms[pokujGracza] = {iloGra: rooms[room].iloGra - 1, host: rooms[room].host};
+            delete players[socket.id];
+        }
+        
+        // console.log('---');
+        // console.log(socket.rooms);
+        // console.log(rooms[room]);
     })
 
     socket.on('lista', (room, {gracze}) => {
@@ -54,19 +81,45 @@ io.on('connection', (socket) => {
         console.log(room + ' XD');
     })
     
+
+
+
     socket.on('disconnect', () => {
         console.log('wywalilo gracza o id: ' + socket.id);
         socket.broadcast.emit('usun', players[socket.id]);
-        delete players[socket.id];
+
+        console.log(players[socket.id] );
+        if(players[socket.id] !== undefined){
+            let socId = socket.id;
+            let pokojroom = players[socId].room;
+
+            rooms[pokojroom] = {iloGra: rooms[pokojroom].iloGra - 1, host: rooms[pokojroom].host};
+            delete players[socket.id];
+
+            if(rooms[pokojroom].host === socket.id){
+                console.log('rozlaczylo hosta ' + rooms[pokojroom].host);
+                console.log('rozlaczylo hosta ' + socket.id);  
+
+                delete rooms[pokojroom];
+            }
+        }
+        else{
+            delete players[socket.id];
+        } 
     })
 
     //za duza liczba graczy
-    socket.on('rozlacz', (id, room, nick) => {
-        console.log('za duzo graczy w ' + room + ' usunieto ' + id);
-        socket.to(id).emit('rozlaczOdp', room);
-        socket.broadcast.emit('usun', players[socket.id]);
-        delete players[socket.id];
-    });
+    // socket.on('rozlacz', (id1, room, nick) => {
+    //     console.log(id1);
+    //     console.log('za duzo graczy w ' + room + ' usunieto ' + id1);
+
+    //     setTimeout(() => {
+    //         socket.to(id1).emit('rozlaczOdp', room, id1);
+    //     }, 2000);
+    //     //socket.to(players[id1].room).emit('usun', players[socket.id]);
+    //     delete players[socket.id];
+    //     rooms[players[socket.id].room] = {iloGra: rooms[room].iloGra - 1, host: rooms[room].host};
+    // });
 
 
 
